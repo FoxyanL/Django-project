@@ -1,0 +1,10 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+    <h2>Описание профессии</h2>
+    <p>Здесь будет текст описания профессии длиной не менее 2000 знаков.</p>
+    <img src="{% static 'main/images/example.jpg' %}" alt="Пример изображения">
+{% endblock %}
