@@ -1,0 +1,46 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Общая статистика{% endblock %}
+
+{% block content %}
+    <h1>Общая статистика</h1>
+
+    <h2>Динамика уровня зарплат по годам</h2>
+    <img src="{% url 'salary_chart' %}" alt="График уровня зарплат">
+
+    <h2>Динамика количества вакансий по годам</h2>
+    <table>
+        <tr><th>Год</th><th>Количество вакансий</th></tr>
+        {% for year, count in vacancies_by_year.items %}
+        <tr><td>{{ year }}</td><td>{{ count }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Уровень зарплат по городам</h2>
+    <table>
+        <tr><th>Город</th><th>Средняя зарплата</th></tr>
+        {% for entry in salaries_by_city %}
+        <tr><td>{{ entry.город }}</td><td>{{ entry.avg_salary }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Доля вакансий по городам</h2>
+    <table>
+        <tr><th>Город</th><th>Доля вакансий (%)</th></tr>
+        {% for city, percentage in city_distribution.items %}
+        <tr><td>{{ city }}</td><td>{{ percentage|floatformat:2 }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>ТОП-20 навыков по годам</h2>
+    {% for year, skills in top_skills_by_year.items %}
+    <h3>{{ year }}</h3>
+    <table>
+        <tr><th>Навык</th><th>Частота</th></tr>
+        {% for skill, frequency in skills %}
+        <tr><td>{{ skill }}</td><td>{{ frequency }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+{% endblock %}
