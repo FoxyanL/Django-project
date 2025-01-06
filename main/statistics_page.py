@@ -20,7 +20,7 @@ def calculate_statistics():
             (vacancy.минимальная_зарплата or 0) +
             (vacancy.максимальная_зарплата or 0)
         ) / 2
-        if vacancy.валюта != "RUB":
+        if vacancy.валюта != "RUR":
             date = vacancy.дата_публикации.strftime('%d/%m/%Y')
             rate = get_exchange_rate(date, vacancy.валюта)
             avg_salary *= Decimal(rate or 1)
@@ -40,7 +40,7 @@ def calculate_statistics():
 
     # 3. Уровень зарплат по городам
     salaries_by_city = (
-        vacancies.filter(валюта="RUB")
+        vacancies.filter(валюта="RUR")
         .values('город')
         .annotate(avg_salary=Avg('максимальная_зарплата'))
         .order_by('-avg_salary')

@@ -13,3 +13,8 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.название
+
+class CBank_rates(models.Model):
+    currency = models.CharField(max_length=255)
+    rate = models.DecimalField(max_digits=15, decimal_places=10, null=True, blank=True)
+    date = models.DateField()

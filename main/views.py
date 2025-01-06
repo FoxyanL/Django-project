@@ -16,14 +16,7 @@ def vacancies_view(request):
     return render(request, 'main/vacancies.html', {'vacancies': vacancies})
 
 def statistics_page(request):
-    #stats = calculate_statistics()
-    stats = {
-        "avg_salary_by_year": 4000,
-        "vacancies_by_year": 'Залупа',
-        "salaries_by_city": [1000, 11, 31312, 12121212],
-        "city_distribution": 'пизда',
-        "top_skills_by_year": ['dada', 'dada'],
-    }
+    stats = calculate_statistics()
     return render(request, 'main/statistics.html', stats)
 
 def generate_salary_chart(request):
