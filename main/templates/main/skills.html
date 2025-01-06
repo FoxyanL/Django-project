@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Навыки{% endblock %}
+
+{% block content %}
+    <h1>Навыки</h1>
+
+    <h2>ТОП-20 навыков по годам</h2>
+    {% for year, skills in top_skills_by_year.items %}
+    <h3>{{ year }}</h3>
+    <table>
+        <tr><th>Навык</th><th>Частота</th></tr>
+        {% for skill, frequency in skills %}
+        <tr><td>{{ skill }}</td><td>{{ frequency }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+{% endblock %}

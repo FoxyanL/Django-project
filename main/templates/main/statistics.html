@@ -12,8 +12,11 @@
     <h2>Динамика количества вакансий по годам</h2>
     <table>
         <tr><th>Год</th><th>Количество вакансий</th></tr>
-        {% for year, count in vacancies_by_year.items %}
-        <tr><td>{{ year }}</td><td>{{ count }}</td></tr>
+        {% for entry in vacancies_by_year %}
+        <tr>
+            <td>{{ entry.year }}</td>
+            <td>{{ entry.count }}</td>
+        </tr>
         {% endfor %}
     </table>
 
@@ -21,7 +24,7 @@
     <table>
         <tr><th>Город</th><th>Средняя зарплата</th></tr>
         {% for entry in salaries_by_city %}
-        <tr><td>{{ entry.город }}</td><td>{{ entry.avg_salary }}</td></tr>
+        <tr><td>{{ entry.город }}</td><td>{{ entry.avg_salary|floatformat:2 }}</td></tr>
         {% endfor %}
     </table>
 

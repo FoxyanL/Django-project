@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Востребованность{% endblock %}
+
+{% block content %}
+    <h1>Востребованность</h1>
+
+    <h2>Динамика уровня зарплат по годам</h2>
+    <img src="{% url 'salary_chart' %}" alt="График уровня зарплат">
+    <table>
+        <tr><th>Год</th><th>Средний уровень зарплат</th></tr>
+        {% for year, avg_salary in avg_salary_by_year.items %}
+        <tr>
+            <td>{{ year }}</td>
+            <td>{{ avg_salary|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Динамика количества вакансий по годам</h2>
+    <table>
+        <tr><th>Год</th><th>Количество вакансий</th></tr>
+        {% for entry in vacancies_by_year %}
+        <tr>
+            <td>{{ entry.year }}</td>
+            <td>{{ entry.count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

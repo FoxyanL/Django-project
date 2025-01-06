@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}География{% endblock %}
+
+{% block content %}
+    <h1>География</h1>
+
+    <h2>Уровень зарплат по городам</h2>
+    <table>
+        <tr><th>Город</th><th>Средняя зарплата</th></tr>
+        {% for entry in salaries_by_city %}
+        <tr><td>{{ entry.город }}</td><td>{{ entry.avg_salary|floatformat:2 }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Доля вакансий по городам</h2>
+    <table>
+        <tr><th>Город</th><th>Доля вакансий (%)</th></tr>
+        {% for city, percentage in city_distribution.items %}
+        <tr><td>{{ city }}</td><td>{{ percentage|floatformat:2 }}</td></tr>
+        {% endfor %}
+    </table>
+{% endblock %}
