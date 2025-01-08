@@ -1,84 +1,48 @@
+from main.models import (
+    All_avg_salary_by_year,
+    All_vacancies_by_year,
+    All_avg_salary_by_city,
+    All_city_distribution,
+    All_top_skills_by_year,
+)
 from collections import defaultdict
-from django.db.models import Avg, Count
-from main.models import Vacancy
-from datetime import datetime
-from main.utils import get_exchange_rate
-from decimal import Decimal
-from django.db.models.functions import ExtractYear
-
 
 def calculate_statistics():
-    # Фильтруем вакансии с некорректной зарплатой
-    vacancies = Vacancy.objects.filter(
-        максимальная_зарплата__lt=10_000_000
-    )
-
-    # 1. Динамика уровня зарплат по годам
-    salary_dynamics = defaultdict(list)
-    for vacancy in vacancies:
-        avg_salary = (
-            (vacancy.минимальная_зарплата or 0) +
-            (vacancy.максимальная_зарплата or 0)
-        ) / 2
-        if avg_salary == 0 or vacancy.валюта is None or not vacancy.валюта:
-            continue
-        if vacancy.валюта != "RUR":
-            date = vacancy.дата_публикации
-            rate = get_exchange_rate(date, vacancy.валюта)
-            if rate:
-                avg_salary *= Decimal(rate)
-            else:
-                continue
-        year = date.year
-        salary_dynamics[year].append(avg_salary)
-
+    # Средняя зарплата по годам
     avg_salary_by_year = {
-        year: sum(salaries) / len(salaries) for year, salaries in salary_dynamics.items()
+        record.year: float(record.salary)
+        for record in All_avg_salary_by_year.objects.all()
     }
 
-    # 2. Динамика количества вакансий по годам
-    vacancies_by_year = (
-        Vacancy.objects.annotate(year=ExtractYear('дата_публикации'))
-        .values('year')
-        .annotate(count=Count('id'))
-    )
+    # Количество вакансий по годам
+    vacancies_by_year = {
+        record.year: int(record.count)
+        for record in All_vacancies_by_year.objects.all()
+    }
 
-    # 3. Уровень зарплат по городам
-    salaries_by_city = (
-        vacancies.filter(валюта="RUR")
-        .values('город')
-        .annotate(avg_salary=Avg('максимальная_зарплата'))
-        .order_by('-avg_salary')
-    )
+    # Средняя зарплата по городам
+    avg_salary_by_city = {
+        record.city: float(record.salary)
+        for record in All_avg_salary_by_city.objects.all()
+    }
 
-    # 4. Доля вакансий по городам
-    total_vacancies = vacancies.count()
-    city_distribution = (
-        vacancies.values('город')
-        .annotate(count=Count('id'))
-        .order_by('-count')
-    )
+    # Доля вакансий по городам
     city_distribution = {
-        entry['город']: entry['count'] / total_vacancies * 100 for entry in city_distribution
+        record.city: float(record.percentage)
+        for record in All_city_distribution.objects.all()
     }
 
-    # 5. ТОП-20 навыков по годам
-    skills_by_year = defaultdict(lambda: defaultdict(int))
-    for vacancy in vacancies:
-        if vacancy.key_skills:
-            year = vacancy.дата_публикации.year
-            for skill in vacancy.key_skills.split(','):
-                skills_by_year[year][skill.strip()] += 1
-
-    top_skills_by_year = {
-        year: sorted(skills.items(), key=lambda x: x[1], reverse=True)[:20]
-        for year, skills in skills_by_year.items()
-    }
+    # Топ навыков по годам
+    top_skills_by_year = defaultdict(dict)
+    for record in All_top_skills_by_year.objects.all():
+        skills = record.skills.split(",") if record.skills else []  # Разделяем навыки через запятую
+        for skill in skills:
+            top_skills_by_year[record.year][skill.strip()] = record.frequency
 
     return {
         "avg_salary_by_year": avg_salary_by_year,
         "vacancies_by_year": vacancies_by_year,
-        "salaries_by_city": salaries_by_city,
+        "avg_salary_by_city": avg_salary_by_city,
         "city_distribution": city_distribution,
-        "top_skills_by_year": top_skills_by_year,
+        "top_skills_by_year": dict(top_skills_by_year),
     }

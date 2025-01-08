@@ -3,7 +3,7 @@ from xml.etree import ElementTree as ET
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from django.core.management.base import BaseCommand
-from main.models import Vacancy, CBank_rates
+from main.models import Vacancy, CBank_rates, All_Vacancies
 import time
 
 
@@ -11,9 +11,9 @@ class Command(BaseCommand):
     help = "Импортирует вакансии из базы данных и сохраняет курсы валют из ЦБР."
 
     def handle(self, *args, **kwargs):
-        vacancies = Vacancy.objects.values('валюта')
+        vacancies = All_Vacancies.objects.values('валюта')
         valutes = set(vacancy['валюта'] for vacancy in vacancies if vacancy['валюта'] and vacancy['валюта'] != "RUR")
-        start_date = datetime(2005, 1, 1)
+        start_date = datetime(2003, 1, 1)
         end_date = datetime(2025, 1, 1)
         current_date = start_date
         
@@ -37,7 +37,7 @@ class Command(BaseCommand):
                             if vunit_rate is not None:
                                 rates = float(vunit_rate.text.replace(",", "."))
                                 try:
-                                    CBank_rates.objects.create(
+                                    CBank_rates.objects.update_or_create(
                                         currency=valute,
                                         rate=Decimal(rates),
                                         date=current_date,

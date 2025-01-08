@@ -7,28 +7,42 @@
     <h1>Общая статистика</h1>
 
     <h2>Динамика уровня зарплат по годам</h2>
-    <img src="{% url 'salary_chart' %}" alt="График уровня зарплат">
+    <img src="/static/{{ salary_chart }}" alt="График уровня зарплат">
+    <table>
+        <tr><th>Год</th><th>Средняя зарплата</th></tr>
+        {% for year, salary in avg_salary_by_year.items %}
+        <tr>
+            <td>{{ year }}</td>
+            <td>{{ salary|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
 
     <h2>Динамика количества вакансий по годам</h2>
+    <img src="/static/{{ vacancies_chart }}" alt="График количества вакансий">
     <table>
         <tr><th>Год</th><th>Количество вакансий</th></tr>
-        {% for entry in vacancies_by_year %}
+        {% for year, count in vacancies_by_year.items %}
         <tr>
-            <td>{{ entry.year }}</td>
-            <td>{{ entry.count }}</td>
+            <td>{{ year }}</td>
+            <td>{{ count }}</td>
         </tr>
         {% endfor %}
     </table>
 
     <h2>Уровень зарплат по городам</h2>
-    <table>
+    <img src="/static/{{ salary_by_city_chart }}" alt="График зарплат по городам">
+    <table style = "display: flex; overflow-y: scroll; width: 400px; height: 400px;">
         <tr><th>Город</th><th>Средняя зарплата</th></tr>
-        {% for entry in salaries_by_city %}
-        <tr><td>{{ entry.город }}</td><td>{{ entry.avg_salary|floatformat:2 }}</td></tr>
+        {% for city, salary in avg_salary_by_city.items %}
+        
+        <tr><td>{{ city }}</td><td>{{ salary|floatformat:2 }}</td></tr>
         {% endfor %}
     </table>
 
     <h2>Доля вакансий по городам</h2>
+    <img src="/static/{{ city_distribution_chart }}" alt="График вакансий по городам">
     <table>
         <tr><th>Город</th><th>Доля вакансий (%)</th></tr>
         {% for city, percentage in city_distribution.items %}
@@ -37,11 +51,12 @@
     </table>
 
     <h2>ТОП-20 навыков по годам</h2>
-    {% for year, skills in top_skills_by_year.items %}
+    {% for year, data in top_skills.items %}
     <h3>{{ year }}</h3>
+    <img src="/static/{{ data.chart_path }}" alt="График навыков за {{ year }}">
     <table>
         <tr><th>Навык</th><th>Частота</th></tr>
-        {% for skill, frequency in skills %}
+        {% for skill, frequency in data.skills.items %}
         <tr><td>{{ skill }}</td><td>{{ frequency }}</td></tr>
         {% endfor %}
     </table>

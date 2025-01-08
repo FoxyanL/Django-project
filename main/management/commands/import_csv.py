@@ -2,7 +2,7 @@ import csv
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from django.core.management.base import BaseCommand
-from main.models import Vacancy
+from main.models import All_Vacancies
 
 
 class Command(BaseCommand):
@@ -21,8 +21,10 @@ class Command(BaseCommand):
             with open(csv_file, newline='', encoding='utf-8-sig') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
+                    '''
                     if not any(keyword in row['name'].lower() for keyword in ['python', 'питон', 'пайтон']):
                         continue
+                    '''
                     # Обработка минимальной зарплаты
                     минимальная_зарплата = None
                     if row['salary_from'] and int(float(row['salary_from'])) < 1000000:  # Проверка на пустое значение
@@ -43,7 +45,7 @@ class Command(BaseCommand):
                     
                     # Создание вакансии в базе данных
                     try:
-                        Vacancy.objects.create(
+                        All_Vacancies.objects.create(
                             название=row['name'],
                             минимальная_зарплата=минимальная_зарплата,
                             максимальная_зарплата=максимальная_зарплата,
