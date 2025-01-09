@@ -45,8 +45,15 @@ class Command(BaseCommand):
         chunksize = 100_000
         dtype_map = {"salary_from": "str", "salary_to": "str", "salary_currency": "str"}
         all_data = []
+        keywords = ('python', 'питон', 'пайтон')  # Список ключевых слов
 
         for chunk in pd.read_csv(file_path, chunksize=chunksize, encoding='utf-8-sig', low_memory=False, dtype=dtype_map):
+            # Приводим названия вакансий в нижний регистр для проверки
+            chunk['name'] = chunk['name'].str.lower()
+
+            # Фильтруем вакансии, оставляя только те, которые содержат ключевые слова
+            chunk = chunk[chunk['name'].str.contains('|'.join(keywords), na=False)]
+
             # Обработка зарплат
             chunk['published_at'] = pd.to_datetime(chunk['published_at'], errors='coerce', utc=True)
             chunk.dropna(subset=['published_at'], inplace=True)  # Удаляем строки с некорректными датами
@@ -131,28 +138,28 @@ class Command(BaseCommand):
         """Сохраняем статистику в базе данных."""
         # Средняя зарплата по годам
         for year, salary in avg_salary_by_year.items():
-            All_avg_salary_by_year.objects.update_or_create(
+            Python_avg_salary_by_year.objects.update_or_create(
                 year=year,
                 defaults={"salary": Decimal(salary)}
             )
 
         # Количество вакансий по годам
         for year, count in vacancies_by_year.items():
-            All_vacancies_by_year.objects.update_or_create(
+            Python_vacancies_by_year.objects.update_or_create(
                 year=year,
                 defaults={"count": count}
             )
 
         # Средняя зарплата по городам
         for city, salary in avg_salary_by_city.items():
-            All_avg_salary_by_city.objects.update_or_create(
+            Python_avg_salary_by_city.objects.update_or_create(
                 city=city,
                 defaults={"salary": Decimal(salary)}
             )
 
         # Доля вакансий по городам
         for city, percentage in city_distribution.items():
-            All_city_distribution.objects.update_or_create(
+            Python_city_distribution.objects.update_or_create(
                 city=city,
                 defaults={"percentage": Decimal(percentage)}
             )
@@ -160,7 +167,7 @@ class Command(BaseCommand):
         # Топ-20 навыков по годам
         for year, skills in top_skills_by_year.items():
             for skill, frequency in skills.items():
-                All_top_skills_by_year.objects.update_or_create(
+                Python_top_skills_by_year.objects.update_or_create(
                     year=year,
                     skills=skill,
                     defaults={"frequency": frequency}

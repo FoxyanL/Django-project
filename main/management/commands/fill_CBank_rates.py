@@ -1,9 +1,9 @@
 import requests
 from xml.etree import ElementTree as ET
 from datetime import datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from django.core.management.base import BaseCommand
-from main.models import Vacancy, CBank_rates, All_Vacancies
+from main.models import *
 import time
 
 

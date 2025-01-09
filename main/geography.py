@@ -1,33 +1,21 @@
 from django.db.models import Avg, Count
-from main.models import Vacancy
+from main.models import Python_avg_salary_by_city, Python_city_distribution
 
 
 def calculate_geography():
-    # Фильтруем вакансии с некорректной зарплатой
-    vacancies = Vacancy.objects.filter(
-        максимальная_зарплата__lt=10_000_000
-    )
+        # Средняя зарплата по городам
+    avg_salary_by_city = {
+        record.city: float(record.salary)
+        for record in Python_avg_salary_by_city.objects.all()
+    }
 
-    # 3. Уровень зарплат по городам
-    salaries_by_city = (
-        vacancies.filter(валюта="RUR")
-        .values('город')
-        .annotate(avg_salary=Avg('максимальная_зарплата'))
-        .order_by('-avg_salary')
-    )
-
-    # 4. Доля вакансий по городам
-    total_vacancies = vacancies.count()
-    city_distribution = (
-        vacancies.values('город')
-        .annotate(count=Count('id'))
-        .order_by('-count')
-    )
+    # Доля вакансий по городам
     city_distribution = {
-        entry['город']: entry['count'] / total_vacancies * 100 for entry in city_distribution
+        record.city: float(record.percentage)
+        for record in Python_city_distribution.objects.all()
     }
 
     return {
-        "salaries_by_city": salaries_by_city,
+        "avg_salary_by_city": avg_salary_by_city,
         "city_distribution": city_distribution,
     }
