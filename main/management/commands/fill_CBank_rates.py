@@ -3,16 +3,27 @@ from xml.etree import ElementTree as ET
 from datetime import datetime, timedelta
 from decimal import Decimal
 from django.core.management.base import BaseCommand
-from main.models import *
 import time
+import pandas as pd
+from main.models import CBank_rates
 
 
 class Command(BaseCommand):
-    help = "Импортирует вакансии из базы данных и сохраняет курсы валют из ЦБР."
+    help = "Импортирует вакансии из CSV файла в базу данных."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'file_path',
+            type=str,
+            help='Путь к CSV файлу с вакансиями'
+        )
 
     def handle(self, *args, **kwargs):
-        vacancies = All_Vacancies.objects.values('валюта')
-        valutes = set(vacancy['валюта'] for vacancy in vacancies if vacancy['валюта'] and vacancy['валюта'] != "RUR")
+        file_path = kwargs['file_path']
+        dtype_map = {"salary_from": "str", "salary_to": "str", "salary_currency": "str"}
+        df = pd.read_csv(file_path, encoding='utf-8-sig', dtype=dtype_map, low_memory=False)
+        filtered_currencies = df['salary_currency'].dropna()
+        valutes = filtered_currencies[filtered_currencies != 'RUR'].unique()
         start_date = datetime(2003, 1, 1)
         end_date = datetime(2025, 1, 1)
         current_date = start_date
@@ -22,7 +33,7 @@ class Command(BaseCommand):
 
             try:
                 url = f"https://www.cbr.ru/scripts/XML_daily.asp?date_req={formatted_date}"
-                time.sleep(1)
+                time.sleep(3)
                 response = requests.get(url, timeout=10)
                 response.raise_for_status()
 
