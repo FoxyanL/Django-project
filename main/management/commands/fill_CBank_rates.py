@@ -36,8 +36,7 @@ class Command(BaseCommand):
                 time.sleep(3)
                 response = requests.get(url, timeout=10)
                 response.raise_for_status()
-
-                # Парсинг XML ответа
+                              
                 tree = ET.fromstring(response.content)
                 rates = None
                 for valute in valutes:
@@ -54,14 +53,13 @@ class Command(BaseCommand):
                                         date=current_date,
                                     )
                                 except Exception as e:
-                                    # Логируем ошибку с полными данными строки
                                     self.stderr.write(self.style.ERROR(f"Ошибка при сохранении CBank_rates: {e}. Строка: {valute, rates, formatted_date}"))
 
 
 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"Ошибка при получении курса валют: {e}"))
-                continue  # Переходим к следующей дате
+                continue
             current_date = current_date + timedelta(days=32)
             current_date = current_date.replace(day=1)
 

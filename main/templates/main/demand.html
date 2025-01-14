@@ -7,7 +7,7 @@
     <h1>Востребованность</h1>
 
     <h2>Динамика уровня зарплат по годам</h2>
-    <img src="/static/{{ salary_chart }}" alt="График уровня зарплат">
+    <img src="{% static 'main/images/python_salary_chart.png' %}" alt="График уровня зарплат">
     <table>
         <tr><th>Год</th><th>Средний уровень зарплат</th></tr>
         {% for year, avg_salary in avg_salary_by_year.items %}
@@ -19,7 +19,7 @@
     </table>
 
     <h2>Динамика количества вакансий по годам</h2>
-    <img src="/static/{{ vacancies_chart }}" alt="График количества вакансий">
+    <img src="{% static 'main/images/python_vacancies_chart.png' %}" alt="График количества вакансий">
     <table>
         <tr><th>Год</th><th>Количество вакансий</th></tr>
         {% for year, count in vacancies_by_year.items %}

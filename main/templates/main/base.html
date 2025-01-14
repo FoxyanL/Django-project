@@ -6,7 +6,9 @@
     <title>{% block title %}Главная{% endblock %}</title>
     
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+    {% block extra_styles %}
+    {% endblock %}
 </head>
 <body>
     <header>
@@ -17,7 +19,7 @@
             <a href="{% url 'demand' %}">Востребованность</a>
             <a href="{% url 'geography' %}">География</a>
             <a href="{% url 'skills' %}">Навыки</a>
-            <a href="#">Последние вакансии</a>
+            <a href="{% url 'latest_vacancies' %}">Последние вакансии</a>
         </nav>
     </header>
     <main>

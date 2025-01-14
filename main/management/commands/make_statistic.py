@@ -17,11 +17,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         file_path = kwargs['file_path']
-
-        # Заранее получаем курсы валют из базы данных
         self.exchange_rates = self.load_exchange_rates()
 
-        # Функция для обработки зарплаты
         def process_salary(value, currency, year, month):
             if currency == 'RUR':
                 try:
@@ -49,9 +46,9 @@ class Command(BaseCommand):
         for chunk in pd.read_csv(file_path, chunksize=chunksize, encoding='utf-8-sig', low_memory=False, dtype=dtype_map):
             # Обработка зарплат
             chunk['published_at'] = pd.to_datetime(chunk['published_at'], errors='coerce', utc=True)
-            chunk.dropna(subset=['published_at'], inplace=True)  # Удаляем строки с некорректными датами
-            chunk['year'] = chunk['published_at'].dt.year  # Извлекаем год
-            chunk['month'] = chunk['published_at'].dt.month  # Извлекаем месяц
+            chunk.dropna(subset=['published_at'], inplace=True)
+            chunk['year'] = chunk['published_at'].dt.year
+            chunk['month'] = chunk['published_at'].dt.month
 
             chunk['salary_from'] = chunk.apply(
                 lambda row: process_salary(row['salary_from'], row['salary_currency'], row['year'], row['month']),
@@ -62,29 +59,21 @@ class Command(BaseCommand):
                 axis=1
             )
 
-            # Удаляем строки с некорректными данными
             chunk.dropna(subset=['name'], inplace=True)
-
-            # Вычисляем среднюю зарплату
             chunk['avg_salary'] = (chunk['salary_from'].fillna(0) + chunk['salary_to'].fillna(0)) / 2
-
-            # Если salary_from и salary_to уже в рублях, то:
             chunk['avg_salary_rub'] = chunk['avg_salary']
 
             all_data.append(chunk)
         df = pd.concat(all_data, ignore_index=True)
-        # Анализ данных
         self.analyze_data(df)
 
     def load_exchange_rates(self):
-        """Заранее загружаем все курсы валют из базы данных в словарь."""
         rates = {}
         for rate in CBank_rates.objects.all():
             rates[(rate.currency, rate.date.month, rate.date.year)] = Decimal(rate.rate)
         return rates
 
     def analyze_data(self, df):
-        """Анализ и сохранение данных в базе."""
         # 1. Средняя зарплата по годам
         df['avg_salary_rub'] = df['avg_salary_rub'].astype(float)
         avg_salary_by_year = df.groupby('year')['avg_salary_rub'].mean().dropna().to_dict()
@@ -108,11 +97,9 @@ class Command(BaseCommand):
         # 5. Топ-20 навыков по годам
         top_skills_by_year = self.get_top_skills_by_year(df)
 
-        # Сохраняем результаты
         self.save_statistics(avg_salary_by_year, vacancies_by_year, avg_salary_by_city, city_distribution, top_skills_by_year)
 
     def get_top_skills_by_year(self, df):
-        """Извлекает и подсчитывает топ-20 навыков по годам."""
         top_skills_by_year = {}
         for year, group in df.groupby('year'):
             if group['key_skills'].dropna().empty:
@@ -120,7 +107,7 @@ class Command(BaseCommand):
             skills = (
                 group['key_skills']
                 .dropna()
-                .str.split(r'[\n,]+')  # Разделяем навыки по запятым и переносам строки
+                .str.split(r'[\n,]+')
                 .explode()
                 .str.strip()
             )
@@ -128,7 +115,6 @@ class Command(BaseCommand):
         return top_skills_by_year
 
     def save_statistics(self, avg_salary_by_year, vacancies_by_year, avg_salary_by_city, city_distribution, top_skills_by_year):
-        """Сохраняем статистику в базе данных."""
         # Средняя зарплата по годам
         for year, salary in avg_salary_by_year.items():
             All_avg_salary_by_year.objects.update_or_create(

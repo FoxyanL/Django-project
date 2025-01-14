@@ -7,7 +7,7 @@
     <h1>География</h1>
 
     <h2>Уровень зарплат по городам</h2>
-    <img src="/static/{{ salary_by_city_chart }}" alt="График зарплат по городам">
+    <img src="{% static 'main/images/python_salary_by_city_chart.png' %}" alt="График зарплат по городам">
     <table style = "display: flex; overflow-y: scroll; width: 400px; height: 400px;">
         <tr><th>Город</th><th>Средняя зарплата</th></tr>
         {% for city, salary in avg_salary_by_city.items %}
@@ -17,7 +17,7 @@
     </table>
 
     <h2>Доля вакансий по городам</h2>
-    <img src="/static/{{ city_distribution_chart }}" alt="График вакансий по городам">
+    <img src="{% static 'main/images/python_city_distribution_chart.png' %}" alt="График вакансий по городам">
     <table>
         <tr><th>Город</th><th>Доля вакансий (%)</th></tr>
         {% for city, percentage in city_distribution.items %}

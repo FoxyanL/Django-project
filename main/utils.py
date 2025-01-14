@@ -2,7 +2,6 @@ from main.models import CBank_rates
 from django.db.models import Q
 
 def get_exchange_rate(currency, date):
-    """Ищет курс валюты для конкретной даты в модели CBank_rates."""
     try:
         rate_obj = CBank_rates.objects.filter(
             Q(currency=currency) & Q(date=date.date())

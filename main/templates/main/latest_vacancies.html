@@ -1,0 +1,37 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'main/css/styles_hh.css' %}">
+{% endblock %}
+{% block title %}Последние вакансии{% endblock %}
+
+{% block content %}
+    {% if vacancy_info_list %}
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Название вакансии</th>
+                    <th>Описание</th>
+                    <th>Навыки</th>
+                    <th>Компания</th>
+                    <th>Оклад</th>
+                    <th>Регион</th>
+                    <th>Дата публикации</th>
+                </tr>
+                {% for vacancy in vacancy_info_list %}
+                <tr>
+                    <td>{{ vacancy.name }}</td>
+                    <td>{{ vacancy.description }}</td>
+                    <td>{{ vacancy.skills }}</td>
+                    <td>{{ vacancy.company_name }}</td>
+                    <td>{{ vacancy.salary }}</td>
+                    <td>{{ vacancy.region_name }}</td>
+                    <td>{{ vacancy.publication_date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+    <p>Вакансий не найдено.</p>
+    {% endif %}
+{% endblock %}

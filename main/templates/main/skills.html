@@ -7,12 +7,12 @@
     <h1>Навыки</h1>
 
     <h2>ТОП-20 навыков по годам</h2>
-    {% for year, data in top_skills_by_year.items %}
+    {% for year, skills in top_skills_by_year.items %}
     <h3>{{ year }}</h3>
-    <img src="/static/{{ data.chart_path }}" alt="График навыков за {{ year }}">
+    <img src="{% static '' %}main/images/python_top_skills_{{ year }}_chart.png" alt="График навыков за {{ year }}">
     <table>
         <tr><th>Навык</th><th>Частота</th></tr>
-        {% for skill, frequency in data.skills.items %}
+        {% for skill, frequency in skills.items %}
         <tr><td>{{ skill }}</td><td>{{ frequency }}</td></tr>
         {% endfor %}
     </table>

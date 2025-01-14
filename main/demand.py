@@ -1,7 +1,6 @@
 from main.models import Python_avg_salary_by_year, Python_vacancies_by_year
 
 
-
 def calculate_demand():
     avg_salary_by_year = {
         record.year: float(record.salary)

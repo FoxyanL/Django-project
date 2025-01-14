@@ -3,10 +3,9 @@ from main.models import Python_top_skills_by_year
 
 
 def calculate_skills():
-    # Топ навыков по годам
     top_skills_by_year = defaultdict(dict)
     for record in Python_top_skills_by_year.objects.all():
-        skills = record.skills.split(",") if record.skills else []  # Разделяем навыки через запятую
+        skills = record.skills.split(",") if record.skills else []
         for skill in skills:
             top_skills_by_year[record.year][skill.strip()] = record.frequency
 
